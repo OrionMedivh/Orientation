@@ -37,9 +37,20 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //    private Square mSquare;
 	private Maze mMaze;
     private float mAngle=0.0f;
-    private float x=0.0f,y=0.0f,z=0.0f;
+    private float x=0f,y=0f,z=0f;
     private double size=Maze.Size;
+    static final double Pi=3.1415926;
     
+    float[] mat_amb = { 1.0f,  1.0f,  1.0f, 1.0f,};  
+	 float[] mat_diff = {0.3f, 0.3f, 0.3f, 1.0f,};  
+	 float[] mat_spec = {1.0f, 1.0f, 1.0f, 1.0f,};  
+    
+   float[] amb = { 1.0f, 1.0f, 1.0f, 1.0f, };  
+   float[] diff = { 1.0f, 1.0f, 1.0f, 1.0f, };  
+   float[] spec = { 1.0f, 1.0f, 1.0f, 1.0f, };  
+//   float[] pos = { 0f, 0f, 2f, 1.0f, };  
+//   float[] spot_dir = { 1.0f, 1.0f, 0.0f, };  
+	 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         // Set the background frame color
@@ -58,11 +69,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Draw background color
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-        float[] amb = { 1.0f, 1.0f, 1.0f, 1.0f, };  
-        float[] diff = { 1.0f, 1.0f, 1.0f, 1.0f, };  
-        float[] spec = { 1.0f, 1.0f, 1.0f, 1.0f, };  
-        float[] pos = { 0.0f, 5.0f, 5.0f, 1.0f, };  
-        float[] spot_dir = { 0.0f, -1.0f, 0.0f, };  
         gl.glEnable(GL10.GL_DEPTH_TEST);  
 //        gl.glEnable(GL10.GL_CULL_FACE);  
           
@@ -89,40 +95,52 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         specBuf.put(spec);  
         specBuf.position(0);  
           
-        ByteBuffer pbb  
-        = ByteBuffer.allocateDirect(pos.length*4);  
-        pbb.order(ByteOrder.nativeOrder());  
-        FloatBuffer posBuf = pbb.asFloatBuffer();  
-        posBuf.put(pos);  
-        posBuf.position(0);  
+//        ByteBuffer pbb  
+//        = ByteBuffer.allocateDirect(pos.length*4);  
+//        pbb.order(ByteOrder.nativeOrder());  
+//        FloatBuffer posBuf = pbb.asFloatBuffer();  
+//        posBuf.put(pos);  
+//        posBuf.position(0);  
           
-        ByteBuffer spbb  
-        = ByteBuffer.allocateDirect(spot_dir.length*4);  
-        spbb.order(ByteOrder.nativeOrder());  
-        FloatBuffer spot_dirBuf = spbb.asFloatBuffer();  
-        spot_dirBuf.put(spot_dir);  
-        spot_dirBuf.position(0);  
+//        ByteBuffer spbb  
+//        = ByteBuffer.allocateDirect(spot_dir.length*4);  
+//        spbb.order(ByteOrder.nativeOrder());  
+//        FloatBuffer spot_dirBuf = spbb.asFloatBuffer();  
+//        spot_dirBuf.put(spot_dir);  
+//        spot_dirBuf.position(0);  
           
+      float[] pos = { (float)(-x+1.0), (float)(-y+1.0), (float)(-z+1.0), 1.0f };  
+//        float[] pos = { 0f,0f,(float) (0.5*size), 1f };
+      float[] spot_dir = { (float) Math.cos(mAngle/180.0f*Pi), (float) Math.sin(mAngle/180.0f*Pi), 0.0f };  
+//      float[] spot_dir = { 1f, 1f, 0f }; 
+        
         gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, ambBuf);  
         gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, diffBuf);  
         gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, specBuf);  
-        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, posBuf);  
+        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, pos,0);  
         gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPOT_DIRECTION,  
-        spot_dirBuf);  
-        gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_EXPONENT, 0.0f);  
-        gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_CUTOFF, 45.0f);
+        spot_dir,0);  
+        gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_EXPONENT, 128);  
+        gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_CUTOFF, 8.0f);
         
         // Set GL_MODELVIEW transformation mode
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();   // reset the matrix to its default state
 
         // When using GL_MODELVIEW, you must set the view point
-        GLU.gluLookAt(gl, 0f, 0f, 0f, 1.0f, 0f, 0f, 0.0f, 0.0f, 1.0f);
+        GLU.gluLookAt(gl, 0f, 0f, 0f, 1.0f, 0f, 0f, 0.0f, 1.0f, 0.0f);
+             
+        // Create a rotation for the maze
+
+        // Use the following code to generate constant rotation.
+        // Leave this code out when using TouchEvents.
+        // long time = SystemClock.uptimeMillis() % 4000L;
+        // float angle = 0.090f * ((int) time);
+
+        gl.glRotatef(mAngle, 0.0f, 0.0f, -1.0f);
+        gl.glTranslatef((float)(-0.5*size),(float)(-0.5*size),(float)(-0.5*size));
+        gl.glTranslatef(x, y, z);
         
-        float[] mat_amb = {0.2f * 0.4f, 0.2f * 0.4f,  
-        		 0.2f * 1.0f, 1.0f,};  
-        		 float[] mat_diff = {0.4f, 0.4f, 1.0f, 1.0f,};  
-        		 float[] mat_spec = {1.0f, 1.0f, 1.0f, 1.0f,};  
         		   
         		 ByteBuffer mabb  
         		 = ByteBuffer.allocateDirect(mat_amb.length*4);  
@@ -152,25 +170,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         		 gl.glMaterialfv(GL10.GL_FRONT_AND_BACK,  
         		 GL10.GL_SPECULAR, mat_specBuf);  
         		 gl.glMaterialf(GL10.GL_FRONT_AND_BACK,  
-        		 GL10.GL_SHININESS, 64.0f);  
-        
-        
-        // Draw square
-//        mSquare.draw(gl);
-
-        // Create a rotation for the triangle
-
-        // Use the following code to generate constant rotation.
-        // Leave this code out when using TouchEvents.
-        // long time = SystemClock.uptimeMillis() % 4000L;
-        // float angle = 0.090f * ((int) time);
-
-        gl.glRotatef(mAngle, 0.0f, 0.0f, -1.0f);
-        gl.glTranslatef((float)(-0.4*size), (float)(-0.4*size), (float)(-0.4*size));
-        gl.glTranslatef(x, y, z);
-        
-        // Draw triangle
-//        mTriangle.draw(gl);
+        		 GL10.GL_SHININESS, 30.0f);  
+                
+        // Draw maze
         mMaze.draw(gl);
     }
 

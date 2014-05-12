@@ -20,7 +20,7 @@ import javax.microedition.khronos.opengles.GL10;
   	    // number of coordinates per vertex in this array
   	    static final int COORDS_PER_VERTEX = 3;
 
-  	    float color[] = { 0.8f, 0.8f, 0.8f, 0.0f };
+  	    float color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   	    static FloatBuffer[] vertexBuffer;
   	    static ShortBuffer[] drawListBuffer;
 		static final short drawOrder[] = { 0, 1, 2, 3, 1, 2 }; // order to draw vertices
