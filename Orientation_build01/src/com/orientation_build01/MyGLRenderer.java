@@ -39,8 +39,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float mAngle=0.0f;
     private float x=0f,y=0f,z=0f;
     private double size=Maze.Size;
-    static final double Pi=Math.PI;
+    static final double Pi=3.1415926;
     
+    
+    /*testing comment, the following three lines are the material parameters for ambient, diffuse and spot light*/
     float[] mat_amb = { 1.0f,  1.0f,  1.0f, 1.0f,};  
 	 float[] mat_diff = {0.3f, 0.3f, 0.3f, 1.0f,};  
 	 float[] mat_spec = {1.0f, 1.0f, 1.0f, 1.0f,};  
