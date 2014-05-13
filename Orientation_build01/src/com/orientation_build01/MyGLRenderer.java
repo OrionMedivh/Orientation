@@ -39,12 +39,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float mAngle=0.0f;
     private float x=0f,y=0f,z=0f;
     private double size=Maze.Size;
-    static final double Pi=3.1415926;
+    private final double height=1.2;
     
     
     /*testing comment, the following three lines are the material parameters for ambient, diffuse and spot light*/
     float[] mat_amb = { 1.0f,  1.0f,  1.0f, 1.0f,};  
-	 float[] mat_diff = {0.3f, 0.3f, 0.3f, 1.0f,};  
+	 float[] mat_diff = {1.0f, 1.0f, 1.0f, 1.0f,};  
 	 float[] mat_spec = {1.0f, 1.0f, 1.0f, 1.0f,};  
     
    float[] amb = { 1.0f, 1.0f, 1.0f, 1.0f, };  
@@ -110,39 +110,21 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        FloatBuffer spot_dirBuf = spbb.asFloatBuffer();  
 //        spot_dirBuf.put(spot_dir);  
 //        spot_dirBuf.position(0);  
-          
-      float[] pos = { (float)(-x+1.0), (float)(-y+1.0), (float)(-z+1.0), 1.0f };  
-//        float[] pos = { 0f,0f,(float) (0.5*size), 1f };
-      float[] spot_dir = { (float) Math.cos(mAngle/180.0f*Pi), (float) Math.sin(mAngle/180.0f*Pi), 0.0f };  
-//      float[] spot_dir = { 1f, 1f, 0f }; 
-        
-        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, ambBuf);  
-        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, diffBuf);  
-        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, specBuf);  
-        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, pos,0);  
-        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPOT_DIRECTION,  
-        spot_dir,0);  
-        gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_EXPONENT, 128);  
-        gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_CUTOFF, 8.0f);
-        
-        // Set GL_MODELVIEW transformation mode
-        gl.glMatrixMode(GL10.GL_MODELVIEW);
-        gl.glLoadIdentity();   // reset the matrix to its default state
-
-        // When using GL_MODELVIEW, you must set the view point
-        GLU.gluLookAt(gl, 0f, 0f, 0f, 1.0f, 0f, 0f, 0.0f, 1.0f, 0.0f);
-             
-        // Create a rotation for the maze
-
-        // Use the following code to generate constant rotation.
-        // Leave this code out when using TouchEvents.
-        // long time = SystemClock.uptimeMillis() % 4000L;
-        // float angle = 0.090f * ((int) time);
-
-        gl.glRotatef(mAngle, 0.0f, 0.0f, -1.0f);
-        gl.glTranslatef((float)(-0.5*size),(float)(-0.5*size),(float)(-0.5*size));
-        gl.glTranslatef(x, y, z);
-        
+           
+      float[] pos = { (float)(x+(0.5*size)), (float)(y+(0.5*size)), (float)(z+1.2*size), 1.0f };  
+//    float[] pos = { 0f,0f,1f, 1f };
+//        float[] pos = { x,y,z+(float)(height*size), 1.0f };  
+  float[] spot_dir = { (float) Math.cos(-mAngle/180.0f*Math.PI), (float) Math.sin(-mAngle/180.0f*Math.PI), 0.0f };  
+//  float[] spot_dir = { 1f, 0f, 0f }; 
+    
+    gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, ambBuf);  
+    gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, diffBuf);  
+    gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, specBuf);  
+    gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, pos,0);  
+    gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPOT_DIRECTION,  
+    spot_dir,0);  
+    gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_EXPONENT, 128);  
+    gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_CUTOFF, 90.0f);
         		   
         		 ByteBuffer mabb  
         		 = ByteBuffer.allocateDirect(mat_amb.length*4);  
@@ -173,6 +155,25 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         		 GL10.GL_SPECULAR, mat_specBuf);  
         		 gl.glMaterialf(GL10.GL_FRONT_AND_BACK,  
         		 GL10.GL_SHININESS, 30.0f);  
+        
+        
+        // Set GL_MODELVIEW transformation mode
+        gl.glMatrixMode(GL10.GL_MODELVIEW);
+        gl.glLoadIdentity();   // reset the matrix to its default state
+
+        // When using GL_MODELVIEW, you must set the view point
+        GLU.gluLookAt(gl, 0f, 0f, 0f, 1.0f, 0f, 0f, 0.0f, -1.0f, 0.0f);
+             
+        // Create a rotation for the maze
+
+        // Use the following code to generate constant rotation.
+        // Leave this code out when using TouchEvents.
+        // long time = SystemClock.uptimeMillis() % 4000L;
+        // float angle = 0.090f * ((int) time);
+
+        gl.glRotatef(mAngle, 0.0f, 0.0f, 1.0f);    
+        gl.glTranslatef((float)(-0.5*size),(float)(-0.5*size),(float)(-height*size));
+        gl.glTranslatef(-x, -y, -z);
                 
         // Draw maze
         mMaze.draw(gl);

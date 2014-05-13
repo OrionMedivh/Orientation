@@ -44,7 +44,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
     private float mPreviousY;
     private boolean touch=false;
     private double step=0.1*Maze.Size;
-    static final double Pi=3.1415926;
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
@@ -82,8 +81,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 break;
             case MotionEvent.ACTION_UP:
             	if (touch==true){
-            	mRenderer.setXYZ((float)(mRenderer.getX()-step*Math.cos(mRenderer.getAngle()/180.0f*Pi)), 
-            			(float)(mRenderer.getY()-step*Math.sin(mRenderer.getAngle()/180.0f*Pi)),
+            	mRenderer.setXYZ((float)(mRenderer.getX()+step*Math.cos(-mRenderer.getAngle()/180.0f*Math.PI)), 
+            			(float)(mRenderer.getY()+step*Math.sin(-mRenderer.getAngle()/180.0f*Math.PI)),
             			mRenderer.getZ());
             	requestRender();
             	}
