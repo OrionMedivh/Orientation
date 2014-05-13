@@ -6,6 +6,10 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
+
+import android.content.Context;
+import android.graphics.*;
+import android.opengl.*;
     
  public class Maze
     {
@@ -15,6 +19,14 @@ import javax.microedition.khronos.opengles.GL10;
   	   int bufferNo=0;
 		static double Size=2.0; // size of the cell.
 
+		private FloatBuffer textureBuffer;  // buffer holding the texture coordinates
+		private float texture[] = {         
+		        // Mapping coordinates for the vertices
+		        0.0f, 1.0f,     // top left     (V2)
+		        0.0f, 0.0f,     // bottom left  (V1)
+		        1.0f, 1.0f,     // top right    (V4)
+		        1.0f, 0.0f      // bottom right (V3)
+		};
 
 
   	    // number of coordinates per vertex in this array
@@ -23,7 +35,7 @@ import javax.microedition.khronos.opengles.GL10;
   	    float color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   	    static FloatBuffer[] vertexBuffer;
   	    static ShortBuffer[] drawListBuffer;
-		static final short drawOrder[] = { 0, 1, 2, 3, 1, 2 }; // order to draw vertices
+		static final short drawOrder[] = { 0, 1, 2, 1, 3, 2 }; // order to draw vertices
   	   
   	   public void setData(int x,int y)
   	   {
@@ -222,12 +234,22 @@ import javax.microedition.khronos.opengles.GL10;
   	        drawListBuffer[BufferID] = dlb.asShortBuffer();
   	        drawListBuffer[BufferID].put(drawOrder);
   	        drawListBuffer[BufferID].position(0); 
+  	        
+  			bb = ByteBuffer.allocateDirect(texture.length * 4);
+  			bb.order(ByteOrder.nativeOrder());
+  			textureBuffer = bb.asFloatBuffer();
+  			textureBuffer.put(texture);
+  			textureBuffer.position(0);
   	   }
   	 
      public void draw(GL10 gl) {
+    	 
+ 		// bind the previously generated texture
+ 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
+ 		
      // Since this shape uses vertex arrays, enable them
      gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-
+		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
      // draw the shape
      gl.glColor4f(       // set color:
              color[0], color[1],
@@ -237,9 +259,12 @@ import javax.microedition.khronos.opengles.GL10;
      gl.glVertexPointer( // point to vertex data:
              COORDS_PER_VERTEX,
              GL10.GL_FLOAT, 0, vertexBuffer[i]);
+		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
+     
 //     gl.glDrawArrays(    // draw shape:
 //             GL10.GL_LINES, 0,
-//             6 / COORDS_PER_VERTEX);    
+//             6 / COORDS_PER_VERTEX);   
+     
      gl.glDrawElements(  // draw shape:
              GL10.GL_TRIANGLES,
              drawOrder.length, GL10.GL_UNSIGNED_SHORT,
@@ -248,6 +273,7 @@ import javax.microedition.khronos.opengles.GL10;
      // Disable vertex array drawing to avoid
      // conflicts with shapes that don't use it
      gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
  }
   	   
   	   public int getwalls(int x)
@@ -263,40 +289,66 @@ import javax.microedition.khronos.opengles.GL10;
   	   public int getColumn()
   	   {
   	     return Column;
-  	   }		 
-    }
+  	   }	
+  	   
+  	   class DisjSets
+  	   {
+  	      /** Construct the disjoint sets object.
+  	       * @param numElements the initial number of disjoint sets.
+  	       */
+  	      public DisjSets( int numElements )
+  	      {
+  	          s = new int [ numElements ];
+  	          for( int i = 0; i < s.length; i++ )
+  	              s[ i ] = -1;
+  	      }
 
-class DisjSets
-{
-      /** Construct the disjoint sets object.
-       * @param numElements the initial number of disjoint sets.
-       */
-      public DisjSets( int numElements )
-      {
-          s = new int [ numElements ];
-          for( int i = 0; i < s.length; i++ )
-              s[ i ] = -1;
-      }
+  	      /**   Union two disjoint sets.  
+  	       *     Assume root1 and root2 are distinct and represent set names.
+  	       * @param root1 the root of set 1.
+  	       * @param root2 the root of set 2.          */
+  	      public void union( int root1, int root2 )
+  	      {
+  	          s[ root2 ] = root1;
+  	      }
+  			  
+  			  /** Perform a find.   Error checks omitted again for simplicity.
+  	       * @param x the element being searched for.
+  	       * @return the set containing x.         */
+  	      public int find( int x )
+  	      {
+  	          if( s[ x ] < 0 )
+  	              return x;
+  	          else
+  	              return find( s[ x ] );
+  	      }
 
-      /**   Union two disjoint sets.  
-       *     Assume root1 and root2 are distinct and represent set names.
-       * @param root1 the root of set 1.
-       * @param root2 the root of set 2.          */
-      public void union( int root1, int root2 )
-      {
-          s[ root2 ] = root1;
-      }
-		  
-		  /** Perform a find.   Error checks omitted again for simplicity.
-       * @param x the element being searched for.
-       * @return the set containing x.         */
-      public int find( int x )
-      {
-          if( s[ x ] < 0 )
-              return x;
-          else
-              return find( s[ x ] );
-      }
+  	      private int [] s;
+  		}
+  	   
+  	 /** The texture pointer */
+  	 private int[] textures = new int[1];
 
-      private int [] s;
-}
+  	 public void loadGLTexture(GL10 gl, Context context) {
+  	 	// loading texture
+  	 	Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),
+  	 			R.drawable.bricks);
+
+  	 	// generate one texture pointer
+  	 	gl.glGenTextures(1, textures, 0);
+  	 	// ...and bind it to our array
+  	 	gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
+  	 	
+  	 	// create nearest filtered texture
+  	 	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
+  	 	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+  	 	
+  	 	// Use Android GLUtils to specify a two-dimensional texture image from our bitmap 
+  	 	GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+  	 	
+  	 	// Clean up
+  	 	bitmap.recycle();
+  	 }
+
+  	 }
+

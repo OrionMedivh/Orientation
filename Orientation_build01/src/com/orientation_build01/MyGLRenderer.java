@@ -19,6 +19,7 @@ import java.nio.*;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 
@@ -39,7 +40,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float mAngle=0.0f;
     private float x=0f,y=0f,z=0f;
     private double size=Maze.Size;
-    private final double height=1.2;
+    private final double height=0.5;
     
     
     /*testing comment, the following three lines are the material parameters for ambient, diffuse and spot light*/
@@ -53,16 +54,33 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //   float[] pos = { 0f, 0f, 2f, 1.0f, };  
 //   float[] spot_dir = { 1.0f, 1.0f, 0.0f, };  
 	 
+   private Context 	context;
+
+   /** Constructor to set the handed over context */
+   public MyGLRenderer(Context context) {
+   	this.context = context;
+   }
+
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        // Set the background frame color
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
 //        mTriangle = new Triangle();
 //        mSquare = new Square();
         mMaze = new Maze();
 		mMaze.setData(20,20);
 		mMaze.creatMaze();
+		
+			// Load the texture for the square
+			mMaze.loadGLTexture(gl, this.context);
+			
+			gl.glEnable(GL10.GL_TEXTURE_2D);			//Enable Texture Mapping ( NEW )
+			gl.glShadeModel(GL10.GL_SMOOTH); 			//Enable Smooth Shading
+			gl.glClearColor(0.0f, 0.0f, 0.0f, 0.5f); 	//Black Background
+			gl.glClearDepthf(1.0f); 					//Depth Buffer Setup
+//			gl.glEnable(GL10.GL_DEPTH_TEST); 			//Enables Depth Testing
+			gl.glDepthFunc(GL10.GL_LEQUAL); 			//The Type Of Depth Testing To Do
+			
+			//Really Nice Perspective Calculations
+			gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST); 	
     }
 
     @Override
@@ -71,7 +89,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Draw background color
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-        gl.glEnable(GL10.GL_DEPTH_TEST);  
+        gl.glEnable(GL10.GL_DEPTH_TEST); 
 //        gl.glEnable(GL10.GL_CULL_FACE);  
           
         gl.glEnable(GL10.GL_LIGHTING);  
