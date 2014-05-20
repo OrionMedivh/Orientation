@@ -180,7 +180,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         gl.glLoadIdentity();   // reset the matrix to its default state
 
         // When using GL_MODELVIEW, you must set the view point
-        GLU.gluLookAt(gl, 0f, 0f, 0f, 1.0f, 0f, 0f, 0.0f, -1.0f, 0.0f);
+        GLU.gluLookAt(gl, 0f, 0f, 0f, 1.0f, 0f, 0f, 0.0f, 0.0f, -1.0f);
              
         // Create a rotation for the maze
 
