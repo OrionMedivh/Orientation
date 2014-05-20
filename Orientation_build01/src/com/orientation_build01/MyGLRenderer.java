@@ -92,8 +92,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         gl.glEnable(GL10.GL_DEPTH_TEST); 
 //        gl.glEnable(GL10.GL_CULL_FACE);  
           
-        gl.glEnable(GL10.GL_LIGHTING);  
-        gl.glEnable(GL10.GL_LIGHT0);  
+//        gl.glEnable(GL10.GL_LIGHTING);  
+//        gl.glEnable(GL10.GL_LIGHT0);  
         ByteBuffer abb  
         = ByteBuffer.allocateDirect(amb.length*4);  
         abb.order(ByteOrder.nativeOrder());  
