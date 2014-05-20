@@ -28,34 +28,45 @@ import android.widget.LinearLayout;
 
 public class MainActivity extends Activity {
 
-	private GLSurfaceView mGLView;
-	private LinearLayout container;
-	private Button forwardButton;
+	private GLSurfaceView mGLView; // main game view
+	private LinearLayout container; // Container for GL view
+	private Button forwardButton; // game control
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// request full screen
 		requestNoTitleFullScreen();
-		
+
 		setContentView(R.layout.activity_main);
 		findViews();
 	}
 
+	/**
+	 * the method initialize UI components and must be called after
+	 * setContentView.
+	 */
 	private void findViews() {
 		// Create a GLSurfaceView instance and set it
-				// as the ContentView for this Activity.
+		// as the ContentView for this Activity.
 		mGLView = new MyGLSurfaceView(this);
+
+		//Game control
 		forwardButton = (Button) findViewById(R.id.button_forward);
-		forwardButton.setOnClickListener(new OnClickListener(){
+		forwardButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				((MyGLSurfaceView) mGLView).moveForward();
-			}});
+			}
+		});
+
 		container = (LinearLayout) findViewById(R.id.container);
-		container.addView(mGLView);
+		container.addView(mGLView); // add game view to UI container
 	}
 
+	/**
+	 * Request full screen and no title theme
+	 */
 	private void requestNoTitleFullScreen() {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,

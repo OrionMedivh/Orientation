@@ -80,14 +80,14 @@ public class MyGLSurfaceView extends GLSurfaceView {
 			break;
 		case MotionEvent.ACTION_UP:
 			if (touch == true) {
-				mRenderer.setXYZ(
-						(float) (mRenderer.getX() + step
-								* Math.cos(-mRenderer.getAngle() / 180.0f
-										* Math.PI)),
-						(float) (mRenderer.getY() + step
-								* Math.sin(-mRenderer.getAngle() / 180.0f
-										* Math.PI)), mRenderer.getZ());
-				requestRender();
+//				mRenderer.setXYZ(
+//						(float) (mRenderer.getX() + step
+//								* Math.cos(-mRenderer.getAngle() / 180.0f
+//										* Math.PI)),
+//						(float) (mRenderer.getY() + step
+//								* Math.sin(-mRenderer.getAngle() / 180.0f
+//										* Math.PI)), mRenderer.getZ());
+//				requestRender();
 			}
 			break;
 
@@ -97,15 +97,17 @@ public class MyGLSurfaceView extends GLSurfaceView {
 		mPreviousY = y;
 		return true;
 	}
-	
-	public void moveForward(){
+
+	/**
+	 * Move forward to the direction user faces, and request render
+	 */
+	public void moveForward() {
 		mRenderer.setXYZ(
 				(float) (mRenderer.getX() + step
-						* Math.cos(-mRenderer.getAngle() / 180.0f
-								* Math.PI)),
+						* Math.cos(-mRenderer.getAngle() / 180.0f * Math.PI)),
 				(float) (mRenderer.getY() + step
-						* Math.sin(-mRenderer.getAngle() / 180.0f
-								* Math.PI)), mRenderer.getZ());
+						* Math.sin(-mRenderer.getAngle() / 180.0f * Math.PI)),
+				mRenderer.getZ());
 		requestRender();
 	}
 }
